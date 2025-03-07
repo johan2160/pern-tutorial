@@ -5,10 +5,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { bookSchema, BookFormValues } from '../schemas/book'
 import { useAuthors } from '../hooks/useAuthors'
 import { useGenres } from '../hooks/useGenres'
-
+import { Book } from '../types/book'
 
 interface BookFormProps {
-  initialData?: BookFormValues
+  initialData?: Book
   onSubmit: (data: BookFormValues) => Promise<void>
   isLoading: boolean
 }
@@ -16,7 +16,14 @@ interface BookFormProps {
 export const BookForm = ({ initialData, onSubmit, isLoading }: BookFormProps) => {
   const { register, handleSubmit, formState: { errors } } = useForm<BookFormValues>({
     resolver: zodResolver(bookSchema),
-    defaultValues: initialData,
+    defaultValues: initialData ? {
+      title: initialData.title,
+      author_id: initialData.author_id,
+      genre_id: initialData.genre_id || undefined,
+      number_of_pages: initialData.number_of_pages,
+      is_read: initialData.is_read,
+      release_date: new Date(initialData.release_date).toISOString().split('T')[0],
+    } : undefined,
   })
 
   const { data: authors = [], isLoading: authorsLoading } = useAuthors()
@@ -37,13 +44,22 @@ export const BookForm = ({ initialData, onSubmit, isLoading }: BookFormProps) =>
       <div>
         <label className="block mb-1 text-sm md:text-base">Author *</label>
         <select
-          {...register('author_id', { valueAsNumber: true })}
+          {...register('author_id', { 
+            valueAsNumber: true,
+            required: 'Author is required' 
+          })}
           className="w-full p-1.5 md:p-2 border rounded bg-gray-300 text-black dark:bg-gray-700 dark:text-white focus:outline-none text-sm md:text-base"
           disabled={isLoading || authorsLoading}
         >
           <option value="">Select an author</option>
           {authors.map(author => (
-            <option key={author.id} value={author.id}>{author.name}</option>
+            <option 
+              key={author.id} 
+              value={author.id}
+              selected={initialData?.author_id === author.id}
+            >
+              {author.name}
+            </option>
           ))}
         </select>
         {errors.author_id && <span className="text-red-500 text-xs md:text-sm">{errors.author_id.message}</span>}
@@ -52,13 +68,22 @@ export const BookForm = ({ initialData, onSubmit, isLoading }: BookFormProps) =>
       <div>
         <label className="block mb-1 text-sm md:text-base">Genre</label>
         <select
-          {...register('genre_id', { valueAsNumber: true })}
+          {...register('genre_id', { 
+            valueAsNumber: true,
+            setValueAs: v => v === "" ? null : Number(v)
+          })}
           className="w-full p-1.5 md:p-2 border rounded bg-gray-300 text-black dark:bg-gray-700 dark:text-white focus:outline-none text-sm md:text-base"
           disabled={isLoading || genresLoading}
         >
           <option value="">Select a genre</option>
           {genres.map(genre => (
-            <option key={genre.id} value={genre.id}>{genre.name}</option>
+            <option 
+              key={genre.id} 
+              value={genre.id}
+              selected={initialData?.genre_id === genre.id}
+            >
+              {genre.name}
+            </option>
           ))}
         </select>
       </div>

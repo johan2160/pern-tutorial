@@ -1,10 +1,8 @@
-'use client'
-
 import { useState } from 'react'
 import { Book } from '../types/book'
 import { useBooks, useCreateBook, useDeleteBook, useUpdateBook } from '../hooks/useBooks'
 import { BookFormValues } from '../schemas/book'
-import { BookList } from '../components/BookList'
+import { BookTable } from '../components/table/BookTable'
 import { BookForm } from '../components/BookForm'
 
 export default function BooksPage() {
@@ -48,7 +46,7 @@ export default function BooksPage() {
       {isLoading ? (
         <div className="text-sm md:text-base text-gray-500">Loading books...</div>
       ) : books.length > 0 ? (
-        <BookList
+        <BookTable
           books={books}
           onEdit={setEditingBook}
           onDelete={handleDelete}
@@ -66,7 +64,7 @@ export default function BooksPage() {
             </h2>
             
             <BookForm
-              initialData={editingBook ?? undefined}
+              initialData={editingBook}
               onSubmit={editingBook ? handleUpdate : handleCreate}
               isLoading={editingBook ? updateMutation.isPending : createMutation.isPending}
             />

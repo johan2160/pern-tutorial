@@ -6,7 +6,7 @@ export const bookSchema = z.object({
   number_of_pages: z.number().int().positive('Must be a positive number'),
   is_read: z.boolean(),
   release_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
-  genre_id: z.number().nullable().optional()
+  genre_id: z.number().nullable().optional().transform(val => val || null)
 })
 
 export type BookFormValues = z.infer<typeof bookSchema>

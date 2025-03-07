@@ -19,3 +19,13 @@ export type BookCreate = Omit<Book, 'id' | 'author' | 'genre'> & {
 }
 
 export type BookUpdate = Partial<BookCreate>
+
+export type BookTableItem = {
+  id: number
+  title: string
+  authorName: string
+  genreName: string | null
+  numberOfPages: number
+  isRead: boolean
+  releaseDate: string
+}
